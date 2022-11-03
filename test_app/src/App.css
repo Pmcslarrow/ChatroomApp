@@ -1,0 +1,130 @@
+
+.App {
+  text-align: center;
+  border: 5px solid #AC1717;
+  opacity: 69%;
+  width: 500px;
+  height: 500px;
+  margin: auto;
+  position: relative;
+  top: 100px;
+  background-color: #7e7e7e;
+}
+
+ul {
+  list-style-type: none;
+}
+
+li {
+  font-family:Arial, Helvetica, sans-serif;
+  color: white;
+  border: 1px solid white;
+  background-color: rgb(9, 149, 39);
+  margin-bottom: 20px;
+  margin-right: 10px;
+  border-radius: 15px;
+  padding: 7.5px;
+  width: max-content;
+  height: max-content;
+  max-width: 200px;
+}
+
+.messageInputBar {
+  background-color:white;
+  margin: 0;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  width: 75%;
+  border: none;
+  text-decoration: none;
+  outline: none;
+  border-radius: 10px;
+}
+
+.messageBar {
+  position: absolute;
+  top: 435px;
+  width: 100%;
+}
+
+.sendButton {
+  background-color:#AC1717;
+  opacity: 69%;
+  border: none;
+  border-radius: 15px;
+  color: white;
+  padding: 12px 28px;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 20px;
+  margin: 10px 2px;
+  cursor: pointer;
+  display: inline;
+  margin-left: 10px;
+}
+
+.messageListBar {
+  position: relative;
+  top: 0;
+}
+
+#messageUsernames {
+  width: max-content;
+
+}
+
+
+.messageSender {
+  max-width: 200px;
+  background-color: #AC1717;
+  opacity: 69%;
+  width: max-content;
+  height: max-content;
+  border: 1px solid white;
+  position: relative;
+  left: 60%;
+  right: 25px;
+  color: black;
+  display: block;
+  margin-bottom: 20px;
+  margin-right: 10px;
+  border-radius: 15px;
+  padding: 7.5px;
+  color: white;
+}
+
+.messageContainer {
+  position: relative;
+  word-wrap: break-word;
+}
+
+
+
+/* LOGIN PAGE CSS */
+
+.usernameDiv, .passwordDiv, .signinDiv, .registerDiv {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top:0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+.passwordDiv {
+  top: 50px;
+}
+
+.signinDiv {
+  top: 100px;
+}
+
+.registerDiv {
+  top: 100px;
+  left: 125px;
+}
+
+
