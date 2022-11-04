@@ -111,7 +111,7 @@ function App() {
           </div>
 
           <div className="signinDiv" id="signinDivId">
-            <button id="signinButtonId" type='submit' onClick={() => {navigate("/register")}}>Sign In</button>
+            <button id="signinButtonId" type='submit' onClick={() => {navigate("/Chatroom")}}>Sign In</button>
           </div>
           
           <div className="registerDiv" id="registerDivId">
