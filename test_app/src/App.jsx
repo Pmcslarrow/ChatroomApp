@@ -1,11 +1,29 @@
 import './App.css';
 import io from "socket.io-client"
 import {useEffect, useState} from 'react'
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import {BrowserRouter, Routes, Route, createHashRouter} from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 const socket = io.connect("http://localhost:3001")
 var ACCESS = false;
 
+
+/* ######################## Firebase Setup ########################*/
+const firebaseConfig = {
+  apiKey: "AIzaSyBUmj5104Hb8QA9yvCUv_dxk-76aTlhvB8",
+  authDomain: "willamettemajorchatroom.firebaseapp.com",
+  projectId: "willamettemajorchatroom",
+  storageBucket: "willamettemajorchatroom.appspot.com",
+  messagingSenderId: "1084318268943",
+  appId: "1:1084318268943:web:549f018da09d0c66f42d7a",
+  measurementId: "G-GEN5KBHKVJ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+/* ################################################################ */
 
 
 function App() {
@@ -98,19 +116,40 @@ function App() {
   function LoginScreen()
   {
     var navigate = useNavigate();
+    var [typedUser, setUsername] = useState("");
+    var [typedPassword, setPassword] = useState("");
+
+    function validateLogin()
+    {
+
+      /* Retrieve from database and validate login info */
+
+
+      /* Validation */
+      if (ACCESS)
+      {
+        navigate("/Chatroom");
+      } else {
+        alert("Username or Password is incorrect")
+      }
+    }
 
     return (
       <>
           <div className="usernameDiv" id="usernameDivId">
-              <input placeholder='Username'></input>
+              <input placeholder='Username' id="usernameInputId" onChange={(event) => {
+                setUsername(event.target.value);
+              }} required></input>
           </div>
 
           <div className="passwordDiv" id="passwordDivId">
-              <input placeholder='Password'></input>
+              <input placeholder='Password' id="passwordInputId" onChange={(event) => {
+                setPassword(event.target.value);
+              }} required></input>
           </div>
 
           <div className="signinDiv" id="signinDivId">
-            <button id="signinButtonId" type='submit' onClick={() => {navigate("/Chatroom")}}>Sign In</button>
+            <button id="signinButtonId" type='submit' onClick={() => {(!typedUser || !typedPassword) ? alert("Enter username/password") : validateLogin()}}>Sign In</button>
           </div>
           
           <div className="registerDiv" id="registerDivId">
@@ -124,18 +163,31 @@ function App() {
   function Register()
   {
     var navigate = useNavigate();
+    var [registerUsername, setUsername] = useState("")
+    var [registerPassword, setPassword] = useState("")
+
+    /* createUser() pushes a username and password to the firebase database */
+    function createUser()
+    {
+      alert(registerUsername)
+      alert(registerPassword)
+      navigate("/");
+      return;
+    }
+
+
     return (
       <>
         <div className="usernameDiv" id="registerUsernameDiv">
-              <input placeholder='Username'></input>
+              <input placeholder='Username' onChange={(event) => {setUsername(event.target.value);}} required></input>
           </div>
 
           <div className="passwordDiv" id="registerPasswordDivId">
-              <input placeholder='Password'></input>
+              <input placeholder='Password' onChange={(event) => {setPassword(event.target.value);}} required></input>
           </div>
 
           <div className="signinDiv" id="signinDivId">
-            <button id="signinButtonId" type='submit' onClick={() => {navigate("/")}}>Submit</button>
+            <button id="signinButtonId" type='submit' onClick={() => {createUser()}}>Submit</button>
         </div>
       </>
     )
