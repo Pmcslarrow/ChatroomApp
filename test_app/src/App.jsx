@@ -2,12 +2,12 @@ import './App.css';
 import io from "socket.io-client"
 import {useEffect, useState} from 'react'
 import {BrowserRouter, Routes, Route, createHashRouter} from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { get, getDatabase, ref, set, child, onValue } from "firebase/database";
+import {sha256} from 'js-sha256'
 const socket = io.connect("http://localhost:3001")
-var ACCESS = false;
-
 
 /* ######################## Firebase Setup ########################*/
 const firebaseConfig = {
@@ -19,25 +19,33 @@ const firebaseConfig = {
   appId: "1:1084318268943:web:549f018da09d0c66f42d7a",
   measurementId: "G-GEN5KBHKVJ"
 };
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-/* ################################################################ */
+
+/* sha256 hash function */
+function CREATE_HASH(password)
+{
+  var hash = sha256.create()
+  hash.update(password)
+  return hash.hex()
+}
 
 
 function App() {
+  var ACCESS = false
 
   function Chatroom()
 {
   const MAX_SIZE = 6;
   const [message, setMessage] = useState("");
   const [messageRecv, setMessageRecv] = useState("");
+  const {state} = useLocation()
+  const username = state.username
 
   function sendMessage()
   {
-    updateScreen(message, "SENDER");
-    socket.emit("SEND_MESSAGE", { message });
+    updateScreen(message, username, "SENDER");
+    socket.emit("SEND_MESSAGE", { message, username });
   }
 
   function delete_first_node(parent, lst)
@@ -63,11 +71,14 @@ function App() {
   }
 
   // Updates the chat list and colors based on sender and/ or receiver
-  function updateScreen(message, flag)
+  function updateScreen(message, username, flag)
   {
     const LIST = document.getElementById("messageListId");
+    var DIV = document.createElement("div")
     var LI = document.createElement("li");
     LI.innerHTML = message;
+    DIV.innerHTML = username;
+    DIV.setAttribute("class", "usernameMessage")
 
     var count = 0;
     for (var child of LIST.children)
@@ -81,9 +92,11 @@ function App() {
     
     if (flag === "SENDER") {
         LI.setAttribute("class", "messageSender")
+    } else {
+      DIV.setAttribute("class", "leftAlign")
     }
-
-    LIST.appendChild(LI);
+    DIV.appendChild(LI)
+    LIST.appendChild(DIV);
     adjustCoordinates(LI);
   }
 
@@ -91,7 +104,7 @@ function App() {
   useEffect(() => {
     socket.on("RECEIVE_MESSAGE", (data) => {
       setMessageRecv(data.message);
-      updateScreen(data.message);
+      updateScreen(data.message, data.username);
     })
   }, [socket])
 
@@ -123,15 +136,26 @@ function App() {
     {
 
       /* Retrieve from database and validate login info */
-
-
-      /* Validation */
-      if (ACCESS)
-      {
-        navigate("/Chatroom");
-      } else {
-        alert("Username or Password is incorrect")
-      }
+      const db = getDatabase(app)
+      const dbRef = ref(db, "users/" + typedUser)
+      onValue(dbRef, (snapshot) => {
+        const databaseResponse = snapshot.val()
+        if (databaseResponse)
+        {
+          var databasePassword = databaseResponse.password
+          const attemptedPassword = CREATE_HASH(typedPassword)
+          if (databasePassword === attemptedPassword)
+          {
+            ACCESS = true
+            navigate("/Chatroom", { state: {username : typedUser }})
+          } else {
+            alert("Username or Password is incorrect")
+          }
+        } else {
+          alert("Username or Password is incorrect")
+        }
+      })
+      
     }
 
     return (
@@ -167,12 +191,40 @@ function App() {
     var [registerPassword, setPassword] = useState("")
 
     /* createUser() pushes a username and password to the firebase database */
-    function createUser()
-    {
-      alert(registerUsername)
-      alert(registerPassword)
-      navigate("/");
-      return;
+    function createUser() {
+      const db = getDatabase();
+      const dbRef = ref(db)
+
+      /* Retrieving user data and checking to see if the typed username already exists */
+      get(child(dbRef, "users"))
+      .then((snapshot) => {
+
+          var users = []
+          snapshot.forEach(snap => {
+            var user = snap.val().username;
+            users.push(user)
+          })
+          
+          var access_token = true
+          users.map((user) => {
+            if (user == registerUsername)
+            {
+              access_token = false
+              alert("User already exists!")
+            }
+          })
+
+          if (access_token)
+          {
+            var hashed_password = CREATE_HASH(registerPassword)
+            set(ref(db, 'users/' + registerUsername), {
+              username: registerUsername,
+              password: hashed_password
+            });
+            navigate("/")
+          }
+          
+      })
     }
 
 
